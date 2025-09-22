@@ -4,6 +4,7 @@ export async function POST() {
   const cookie = cookies().toString();
   const res = await fetch(`${API}/api/auth/logout`, {
     method: "POST",
+    credentials: "include",
     headers: { cookie },
   });
   const out = new Response(null, { status: res.status });

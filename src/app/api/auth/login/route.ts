@@ -7,6 +7,7 @@ export async function POST(req: NextRequest) {
   const res = await fetch(`${API}/api/auth/login`, {
     method: "POST",
     body,
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     // include NO cookies from Next here; login sets cookies in response
   });

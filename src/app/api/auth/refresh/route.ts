@@ -5,6 +5,7 @@ export async function POST() {
   const cookie = cookies().toString();
   const res = await fetch(`${API}/api/auth/refresh`, {
     method: "POST",
+    credentials: "include",
     headers: { cookie },
   });
   const text = await res.text();

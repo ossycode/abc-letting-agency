@@ -122,6 +122,20 @@ export type LandlordDtoPagedListWritable = {
     total: number;
 };
 
+export type GetHealthzData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/healthz';
+};
+
+export type GetHealthzResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type GetApiAdminPermissionsCatalogData = {
     body?: never;
     path?: never;
@@ -285,7 +299,7 @@ export type PostApiAuthRegisterData = {
     body?: RegisterRequest;
     path?: never;
     query?: never;
-    url: '/api/Auth/register';
+    url: '/api/auth/register';
 };
 
 export type PostApiAuthRegisterErrors = {
@@ -342,7 +356,7 @@ export type PostApiAuthLoginData = {
     body?: LoginRequest;
     path?: never;
     query?: never;
-    url: '/api/Auth/login';
+    url: '/api/auth/login';
 };
 
 export type PostApiAuthLoginErrors = {
@@ -399,7 +413,7 @@ export type PostApiAuthRefreshData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/api/Auth/refresh';
+    url: '/api/auth/refresh';
 };
 
 export type PostApiAuthRefreshErrors = {
@@ -456,7 +470,7 @@ export type PostApiAuthLogoutData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/api/Auth/logout';
+    url: '/api/auth/logout';
 };
 
 export type PostApiAuthLogoutErrors = {
@@ -521,7 +535,7 @@ export type GetApiLandlordData = {
         SearchFields?: Array<string>;
         filters?: Array<FilterRule>;
     };
-    url: '/api/Landlord';
+    url: '/api/landlord';
 };
 
 export type GetApiLandlordErrors = {
@@ -578,7 +592,7 @@ export type PostApiLandlordData = {
     body?: CreateLandlordRequest;
     path?: never;
     query?: never;
-    url: '/api/Landlord';
+    url: '/api/landlord';
 };
 
 export type PostApiLandlordErrors = {
@@ -637,7 +651,7 @@ export type DeleteApiLandlordByIdData = {
         id: string;
     };
     query?: never;
-    url: '/api/Landlord/{id}';
+    url: '/api/landlord/{id}';
 };
 
 export type DeleteApiLandlordByIdErrors = {
@@ -696,7 +710,7 @@ export type GetApiLandlordByIdData = {
         id: string;
     };
     query?: never;
-    url: '/api/Landlord/{id}';
+    url: '/api/landlord/{id}';
 };
 
 export type GetApiLandlordByIdErrors = {
@@ -755,7 +769,7 @@ export type PatchApiLandlordByIdData = {
         id: string;
     };
     query?: never;
-    url: '/api/Landlord/{id}';
+    url: '/api/landlord/{id}';
 };
 
 export type PatchApiLandlordByIdErrors = {
@@ -812,7 +826,7 @@ export type DeleteApiUserData = {
     body?: DeleteMeRequest;
     path?: never;
     query?: never;
-    url: '/api/User';
+    url: '/api/user';
 };
 
 export type DeleteApiUserErrors = {
@@ -869,7 +883,7 @@ export type GetApiUserData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/api/User';
+    url: '/api/user';
 };
 
 export type GetApiUserErrors = {
@@ -926,7 +940,7 @@ export type PatchApiUserData = {
     body?: UpdateMeRequest;
     path?: never;
     query?: never;
-    url: '/api/User';
+    url: '/api/user';
 };
 
 export type PatchApiUserErrors = {
@@ -983,7 +997,7 @@ export type PutApiUserPasswordData = {
     body?: ChangePasswordRequest;
     path?: never;
     query?: never;
-    url: '/api/User/password';
+    url: '/api/user/password';
 };
 
 export type PutApiUserPasswordErrors = {

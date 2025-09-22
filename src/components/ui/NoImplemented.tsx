@@ -23,7 +23,7 @@ export default function NotImplemented() {
         >
           Go Back
         </button>
-        <Link href={`/`}>
+        <Link href={`/app`}>
           <button
             className="px-4 py-2   bg-primary-accent rounded-lg
      hover:bg-transparent hover:border-link-hover hover:text-link-hover bg-gray-200 text-gray-800 dark:bg-slate-50 text-sm font-medium transition"

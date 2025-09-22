@@ -58,10 +58,10 @@ const navItems: NavItem[] = [
     icon: <UserCircleIcon />,
     name: "Tenants",
     subItems: [
-      { name: "All Tenants", path: "/app/tenants" },
-      { name: "Arrears", path: "/app/tenants/arrears" },
-      { name: "Documents", path: "/app/tenants/documents" },
-      { name: "Status Tracking", path: "/app/tenants/status" },
+      { name: "All Tenants", path: "#" },
+      { name: "Arrears", path: "#" },
+      { name: "Documents", path: "#" },
+      { name: "Status Tracking", path: "#" },
     ],
   },
 
@@ -69,11 +69,11 @@ const navItems: NavItem[] = [
     icon: <GridIcon />,
     name: "Properties",
     subItems: [
-      { name: "All Properties", path: "/properties" },
-      { name: "Managed", path: "/properties/managed" },
-      { name: "Availability", path: "/properties/availability" },
-      { name: "Maintenance History", path: "/properties/maintenance" },
-      { name: "Documents", path: "/properties/documents" },
+      { name: "All Properties", path: "#" },
+      { name: "Managed", path: "#" },
+      { name: "Availability", path: "#" },
+      { name: "Maintenance History", path: "#" },
+      { name: "Documents", path: "#" },
     ],
   },
 
@@ -81,53 +81,53 @@ const navItems: NavItem[] = [
     icon: <TaskIcon />,
     name: "Tenancies",
     subItems: [
-      { name: "Active", path: "/tenancies" },
-      { name: "Expiring Soon", path: "/tenancies/expiring" },
-      { name: "Deposit Ledger", path: "/tenancies/deposits" },
-      { name: "Documents", path: "/tenancies/documents" },
+      { name: "Active", path: "#" },
+      { name: "Expiring Soon", path: "#" },
+      { name: "Deposit Ledger", path: "#" },
+      { name: "Documents", path: "#" },
     ],
   },
   {
     icon: <TableIcon />,
     name: "Rent Book",
     subItems: [
-      { name: "Payments", path: "/payments" },
-      { name: "Allocate Receipts", path: "/payments/allocate" },
-      { name: "Arrears", path: "/payments/arrears" },
-      { name: "Receipts", path: "/payments/receipts" },
+      { name: "Payments", path: "#" },
+      { name: "Allocate Receipts", path: "#" },
+      { name: "Arrears", path: "#" },
+      { name: "Receipts", path: "#" },
     ],
   },
   {
     icon: <BoxCubeIcon />,
     name: "Money Held",
     subItems: [
-      { name: "Deposits", path: "/money-held/deposits" },
-      { name: "Client Funds", path: "/money-held/client-funds" },
-      { name: "Reconciliations", path: "/money-held/reconcile" },
-      { name: "Transfers", path: "/money-held/transfers" },
+      { name: "Deposits", path: "#" },
+      { name: "Client Funds", path: "#" },
+      { name: "Reconciliations", path: "#" },
+      { name: "Transfers", path: "#" },
     ],
   },
   {
     icon: <DocsIcon />,
     name: "Invoices",
     subItems: [
-      { name: "Received", path: "/invoices/received" },
-      { name: "Raised", path: "/invoices/raised" },
-      { name: "Credit Notes", path: "/invoices/credit-notes" },
-      { name: "Aging", path: "/invoices/aging" },
+      { name: "Received", path: "#" },
+      { name: "Raised", path: "#" },
+      { name: "Credit Notes", path: "#" },
+      { name: "Aging", path: "#" },
     ],
   },
   {
     icon: <ChatIcon />,
     name: "Updates / Notes",
     subItems: [
-      { name: "All Updates", path: "/updates" },
-      { name: "By Entity", path: "/updates/search" },
-      { name: "Tags", path: "/updates/tags" },
+      { name: "All Updates", path: "#" },
+      { name: "By Entity", path: "#" },
+      { name: "Tags", path: "#" },
     ],
   },
-  { icon: <CalendarIcon />, name: "Calendar", path: "/calendar" },
-  { icon: <UserCircleIcon />, name: "User Profile", path: "/profile" },
+  { icon: <CalendarIcon />, name: "Calendar", path: "#" },
+  { icon: <UserCircleIcon />, name: "User Profile", path: "#" },
 ];
 
 // === OTHERS (Reports & admin utilities) ===
@@ -136,44 +136,44 @@ const othersItems: NavItem[] = [
     icon: <PieChartIcon />,
     name: "Reports",
     subItems: [
-      { name: "Rent Roll", path: "/reports/rent-roll" },
-      { name: "Arrears Summary", path: "/reports/arrears" },
-      { name: "Money Held Summary", path: "/reports/money-held" },
-      { name: "Landlord Statements", path: "/reports/landlord-statements" },
-      { name: "Audit Log", path: "/reports/audit-log" },
-      { name: "Exports", path: "/reports/exports" },
+      { name: "Rent Roll", path: "#" },
+      { name: "Arrears Summary", path: "#" },
+      { name: "Money Held Summary", path: "#" },
+      { name: "Landlord Statements", path: "#" },
+      { name: "Audit Log", path: "#" },
+      { name: "Exports", path: "#" },
     ],
   },
   {
     icon: <PlugInIcon />,
     name: "Administration",
     subItems: [
-      { name: "Users & Roles", path: "/admin/users" },
-      { name: "Reference Data", path: "/admin/reference" },
-      { name: "Integrations", path: "/admin/integrations" },
-      { name: "Backups", path: "/admin/backups" },
-      { name: "System Health", path: "/admin/health" },
+      { name: "Users & Roles", path: "#" },
+      { name: "Reference Data", path: "#" },
+      { name: "Integrations", path: "#" },
+      { name: "Backups", path: "#" },
+      { name: "System Health", path: "#" },
     ],
   },
 ];
 
 // === SUPPORT (Comms & inboxes) ===
 const supportItems: NavItem[] = [
-  { icon: <ChatIcon />, name: "Chat", path: "/chat" },
+  { icon: <ChatIcon />, name: "Chat", path: "#" },
   {
     icon: <MailIcon />,
     name: "Email",
     subItems: [
-      { name: "Inbox", path: "/inbox" },
-      { name: "Details", path: "/inbox-details" },
+      { name: "Inbox", path: "#" },
+      { name: "Details", path: "#" },
     ],
   },
   {
     icon: <PageIcon />,
     name: "Documents",
     subItems: [
-      { name: "File Manager", path: "/documents" },
-      { name: "Templates", path: "/documents/templates" },
+      { name: "File Manager", path: "#" },
+      { name: "Templates", path: "#" },
     ],
   },
 ];
@@ -420,7 +420,7 @@ const AppSidebar: React.FC = () => {
             <Logo />
           </>
         ) : (
-          <Link href={"/"}>ABC</Link>
+          <Link href={"/app"}>ABC</Link>
         )}
       </div>
       <div className="flex flex-col overflow-y-auto  duration-300 ease-linear no-scrollbar">

@@ -1,8 +1,8 @@
 "use client";
 
 import { useSidebar } from "@/context/SidebarContext";
-import Image from "next/image";
-import Link from "next/link";
+// import Image from "next/image";
+// import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import NotificationDropdown from "../ui/header/NotificationDropdown";
 import UserDropdown from "../ui/header/UserDropdown";
@@ -84,7 +84,7 @@ const AppHeader: React.FC = () => {
             {/* Cross Icon */}
           </button>
 
-          <Link href="/" className="lg:hidden">
+          {/* <Link href="/" className="lg:hidden">
             <Image
               width={154}
               height={32}
@@ -99,7 +99,7 @@ const AppHeader: React.FC = () => {
               src="./images/logo/logo-dark.svg"
               alt="Logo"
             />
-          </Link>
+          </Link> */}
 
           <button
             onClick={toggleApplicationMenu}

@@ -19,7 +19,7 @@ const SigninForm = () => {
   const router = useRouter();
 
   const searchParams = useSearchParams();
-  const returnTo = searchParams.get("returnTo") ?? "/dashboard";
+  const returnTo = searchParams.get("returnTo") ?? "/app";
 
   const login = useLogin();
 

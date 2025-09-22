@@ -1,0 +1,230 @@
+// --- Users & Roles ---
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(CLERK) // ADMIN | MANAGER | CLERK | READONLY
+  password  String   // or null if SSO
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role { ADMIN MANAGER CLERK READONLY }
+
+// --- Parties ---
+model Landlord {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  bankIban  String?
+  bankSort  String?
+  notes     String?
+  properties Property[]
+  tenancies  Tenancy[]
+  invoices   Invoice[] // landlord-side invoices if applicable
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tenant {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String?
+  phone     String?
+  status    TenantStatus @default(ACTIVE) // ACTIVE | NOTICE | ENDED
+  documents Document[]
+  tenancies Tenancy[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+enum TenantStatus { ACTIVE NOTICE ENDED }
+
+// --- Properties & Tenancies ---
+model Property {
+  id           String   @id @default(cuid())
+  code         String?  @unique // optional friendly code
+  addressLine1 String
+  addressLine2 String?
+  city         String?
+  postcode     String?
+  bedrooms     Int?
+  bathrooms    Int?
+  furnished    Boolean? // if you track this
+  availableFrom DateTime?
+  landlordId   String
+  landlord     Landlord @relation(fields: [landlordId], references: [id])
+  tenancies    Tenancy[]
+  maintenance  MaintenanceJob[]
+  invoices     Invoice[]
+  updates      Update[]  @relation("PropertyUpdates")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Tenancy {
+  id            String   @id @default(cuid())
+  propertyId    String
+  property      Property @relation(fields: [propertyId], references: [id])
+
+  landlordId    String
+  landlord      Landlord @relation(fields: [landlordId], references: [id])
+
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+
+  status        TenancyStatus @default(ACTIVE) // PENDING | ACTIVE | ENDED
+  startDate     DateTime?
+  endDate       DateTime?
+  checkInDate   DateTime?
+  managementStart DateTime?
+  taRenewalDate DateTime?
+
+  rentAmount          Decimal @db.Numeric(12,2)
+  rentDueDay          Int?    // “Day Rent Due” from xlsx
+  commissionPercent   Decimal? @db.Numeric(5,2) // “Comm %” (current)
+  commissionPercentTo15 Decimal? @db.Numeric(5,2) // “Comm % to 12/15” if you need historic split
+
+  depositAmount  Decimal? @db.Numeric(12,2)
+  depositLocation String? // scheme / bank ref
+  notes          String?
+
+  charges   RentCharge[]
+  receipts  RentReceipt[]
+  ledger    ClientLedger[] // money held movements
+  updates   Update[]       @relation("TenancyUpdates")
+  documents Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+enum TenancyStatus { PENDING ACTIVE ENDED }
+
+// --- Rents: charges and receipts (arrears computed per period) ---
+model RentCharge {
+  id         String   @id @default(cuid())
+  tenancyId  String
+  tenancy    Tenancy  @relation(fields: [tenancyId], references: [id])
+  periodStart DateTime
+  periodEnd   DateTime
+  dueDate     DateTime
+  amount      Decimal  @db.Numeric(12,2)
+  commissionDue Decimal? @db.Numeric(12,2)  // “Comm Due”
+  amountAfterCommission Decimal? @db.Numeric(12,2) // “Rent after Comm”
+  status      ChargeStatus @default(OPEN) // OPEN | PART_PAID | SETTLED | WRITEOFF
+  receipts    RentReceipt[] // allocations
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+enum ChargeStatus { OPEN PART_PAID SETTLED WRITEOFF }
+
+model RentReceipt {
+  id          String   @id @default(cuid())
+  tenancyId   String
+  tenancy     Tenancy  @relation(fields: [tenancyId], references: [id])
+  receivedAt  DateTime
+  amount      Decimal  @db.Numeric(12,2)
+  method      String?  // cash/bank/standing order reference
+  reference   String?
+  notes       String?
+  // Allocation (optional many-to-one simple model; many-to-many if splitting)
+  chargeId    String?
+  charge      RentCharge? @relation(fields: [chargeId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+// --- Client Money / Money Held ledger ---
+model ClientLedger {
+  id          String   @id @default(cuid())
+  tenancyId   String?
+  tenancy     Tenancy? @relation(fields: [tenancyId], references: [id])
+  propertyId  String?
+  property    Property? @relation(fields: [propertyId], references: [id])
+  landlordId  String?
+  landlord    Landlord? @relation(fields: [landlordId], references: [id])
+  tenantId    String?
+  tenant      Tenant?   @relation(fields: [tenantId], references: [id])
+
+  entryType   LedgerType // DEPOSIT | OVERPAYMENT | FLOAT | WITHDRAWAL | FEE
+  amount      Decimal  @db.Numeric(12,2) // +credit / -debit
+  description String?
+  occurredAt  DateTime
+  // present balance is computed, not stored
+  createdAt   DateTime @default(now())
+}
+enum LedgerType { DEPOSIT OVERPAYMENT FLOAT WITHDRAWAL FEE }
+
+// --- Invoices (AP) ---
+model Invoice {
+  id          String   @id @default(cuid())
+  propertyId  String?
+  property    Property? @relation(fields: [propertyId], references: [id])
+  tenancyId   String?
+  tenancy     Tenancy?  @relation(fields: [tenancyId], references: [id])
+  vendorName  String    // supplier
+  reference   String?
+  description String?
+  issueDate   DateTime
+  dueDate     DateTime?
+  netAmount   Decimal @db.Numeric(12,2)
+  vatAmount   Decimal @db.Numeric(12,2)
+  grossAmount Decimal @db.Numeric(12,2)
+  status      InvoiceStatus @default(OPEN) // OPEN | PAID | PART_PAID | VOID
+  paidAt      DateTime?
+  documentId  String?
+  document    Document? @relation(fields: [documentId], references: [id])
+  createdAt   DateTime @default(now())
+}
+enum InvoiceStatus { OPEN PART_PAID PAID VOID }
+
+// --- Maintenance history (optional but in brief) ---
+model MaintenanceJob {
+  id          String   @id @default(cuid())
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id])
+  title       String
+  details     String?
+  status      JobStatus @default(OPEN) // OPEN | SCHEDULED | DONE | CANCELLED
+  openedAt    DateTime @default(now())
+  closedAt    DateTime?
+  cost        Decimal? @db.Numeric(12,2)
+  invoiceId   String?
+  invoice     Invoice? @relation(fields: [invoiceId], references: [id])
+}
+
+// --- Notes & Documents ---
+model Update {
+  id        String   @id @default(cuid())
+  body      String
+  createdAt DateTime @default(now())
+  createdBy String?
+  // polymorphic via nullable FKs (simple & fast for internal admin apps)
+  propertyId String? 
+  property   Property? @relation("PropertyUpdates", fields: [propertyId], references: [id])
+  tenancyId  String?
+  tenancy    Tenancy?  @relation("TenancyUpdates", fields: [tenancyId], references: [id])
+  landlordId String?
+  landlord   Landlord? @relation("LandlordUpdates", fields: [landlordId], references: [id])
+  tenantId   String?
+  tenant     Tenant?   @relation("TenantUpdates", fields: [tenantId], references: [id])
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  url       String
+  name      String
+  mimeType  String?
+  uploadedAt DateTime @default(now())
+  tenancyId  String?
+  tenancy    Tenancy? @relation(fields: [tenancyId], references: [id])
+  tenantId   String?
+  tenant     Tenant?  @relation(fields: [tenantId], references: [id])
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id])
+  invoiceId  String?
+  invoice    Invoice? @relation(fields: [invoiceId], references: [id])
+}
+
+enum JobStatus { OPEN SCHEDULED DONE CANCELLED }

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: " SignIn Page ",
 };
 
-export default function Home() {
+export default function SignInPage() {
   return (
     <div className="relative flex lg:flex-row w-full h-screen justify-center flex-col  sm:p-0">
       <SigninForm />

@@ -69,7 +69,7 @@ const navItems: NavItem[] = [
     icon: <GridIcon />,
     name: "Properties",
     subItems: [
-      { name: "All Properties", path: "#" },
+      { name: "All Properties", path: "/app/properties" },
       { name: "Managed", path: "#" },
       { name: "Availability", path: "#" },
       { name: "Maintenance History", path: "#" },

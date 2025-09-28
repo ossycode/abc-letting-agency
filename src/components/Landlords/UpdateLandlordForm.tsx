@@ -1,10 +1,7 @@
 "use client";
 
-import { getApiLandlordById, patchApiLandlordById } from "@/api/sdk";
-import { getApiLandlordByIdQueryKey } from "@/api/sdk/@tanstack/react-query.gen";
-import { Landlord } from "@/types/landlord";
+import { UpdateLandlordRequest } from "@/types/landlord";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -14,6 +11,8 @@ import Label from "../ui/Label";
 import Input from "../ui/InputField";
 import TextArea from "../ui/TextArea";
 import Button from "../ui/Button";
+import { useLandlord, useUpdateLandlord } from "@/hooks/landlord/landlord";
+import { applyProblemDetailsToForm } from "@/helper";
 
 const landlordUpdateSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(200),
@@ -39,7 +38,6 @@ function UpdateLandlordForm({ id: propId, onSuccess }: Props) {
     [propId, params]
   );
 
-  const qc = useQueryClient();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -61,96 +59,68 @@ function UpdateLandlordForm({ id: propId, onSuccess }: Props) {
       notes: "",
     },
   });
-
-  // --- Load existing landlord (prefill form) ---
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["landlord", id],
+  const { data, isLoading, isError, error } = useLandlord(id, {
     enabled: !!id,
-    queryFn: async ({ signal }) => {
-      const { data } = await getApiLandlordById({
-        path: { id: id! },
-        signal,
-        throwOnError: true,
-      });
-      return data as Landlord;
-    },
-    retry: 1,
   });
-
-  const defaults = useMemo(
-    () => ({
-      name: data?.name ?? "",
-      email: data?.email ?? "",
-      phone: data?.phone ?? "",
-      address: data?.address ?? "",
-      bankIban: data?.bankIban ?? "",
-      bankSort: data?.bankSort ?? "",
-      notes: data?.notes ?? "",
-    }),
-    [data]
-  );
 
   useEffect(() => {
-    if (data) reset(defaults);
-  }, [data, defaults, reset]);
+    if (!data) return;
+    reset({
+      name: data.name ?? "",
+      email: data.email ?? "",
+      phone: data.phone ?? "",
+      address: data.address ?? "",
+      bankIban: data.bankIban ?? "",
+      bankSort: data.bankSort ?? "",
+      notes: data.notes ?? "",
+    });
+  }, [data, reset]);
+
+  // const defaults = useMemo(
+  //   () => ({
+  //     name: data?.name ?? "",
+  //     email: data?.email ?? "",
+  //     phone: data?.phone ?? "",
+  //     address: data?.address ?? "",
+  //     bankIban: data?.bankIban ?? "",
+  //     bankSort: data?.bankSort ?? "",
+  //     notes: data?.notes ?? "",
+  //   }),
+  //   [data]
+  // );
+
+  // useEffect(() => {
+  //   if (data) reset(defaults);
+  // }, [data, defaults, reset]);
 
   // --- Save (PATCH) ---
-  const mutation = useMutation({
-    mutationFn: async (values: LandlordUpdateForm) => {
-      const res = await patchApiLandlordById({
-        path: { id: id! },
-        body: {
-          name: values.name,
-          email: values.email,
-          phone: values.phone,
-          address: values.address,
-          bankIban: values.bankIban || null,
-          bankSort: values.bankSort || null,
-          notes: values.notes || null,
-        },
-        headers: { "Idempotency-Key": crypto.randomUUID() },
-      });
-      return res;
-    },
-    onSuccess: async (res) => {
-      if (!res.response.ok) return;
-      await qc.invalidateQueries({
-        queryKey: getApiLandlordByIdQueryKey({ path: { id: id! } }),
-      });
-      await qc.invalidateQueries({ queryKey: ["getApiLandlord"] });
-    },
-  });
+
+  const update = useUpdateLandlord(id ?? "");
 
   const onSubmit = async (values: LandlordUpdateForm) => {
+    if (!id) return;
+
     setServerError(null);
-    const { data, error, response } = await mutation.mutateAsync(values);
+    try {
+      const payload: UpdateLandlordRequest = {
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        address: values.address,
+        bankIban: values.bankIban,
+        bankSort: values.bankSort,
+        notes: values.notes,
+      };
 
-    if (!response.ok) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const problem = (error as any) ?? data;
-      const details: Record<string, string | string[]> | undefined =
-        problem?.errors || problem?.Extensions?.errors;
-
-      if (details) {
-        Object.entries(details).forEach(([key, message]) => {
-          setError(key as keyof LandlordUpdateForm, {
-            type: "server",
-            message: Array.isArray(message) ? message[0] : String(message),
-          });
-        });
-        return;
-      }
-
-      setServerError(
-        problem?.title || problem?.message || "Failed to update landlord."
-      );
-      return;
+      await update.mutateAsync(payload);
+      // (useUpdateLandlord onSuccess already updates cache)
+      toast.success("Landlord updated successfully!");
+      onSuccess?.();
+    } catch (err) {
+      const top = applyProblemDetailsToForm(err, setError);
+      setServerError(top ?? "Something went wrong.");
+      toast.error("Something went wrong.");
     }
-
-    toast.success("Landlord updated successfully!");
-    onSuccess?.();
-    // Optionally go back to list or details:
-    // router.push("/app/landlords");
   };
 
   if (!id) {

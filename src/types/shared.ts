@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export type ProblemDetails = {
   type?: string;
   title?: string;
@@ -19,40 +18,59 @@ export type ResultEnvelope<T> = {
   errors?: Array<{ key?: string; message: string }>;
 };
 
-export function isResultEnvelope<T = unknown>(
-  data: any
-): data is ResultEnvelope<T> {
-  return data && typeof data === "object" && "isSuccess" in data;
-}
+export type ApiResult<T> = {
+  isSuccess: boolean;
+  value?: T;
+  errors?: string[];
+};
 
-export function isProblem(data: any): data is ProblemDetails {
-  return (
-    data && typeof data === "object" && ("status" in data || "title" in data)
-  );
-}
+export type QueryOptions = {
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDesc?: boolean;
+  search?: string;
+  searchFields?: string[];
+};
 
-export function normalizeResponse<T>(data: any): T | null {
-  if (isResultEnvelope<T>(data)) {
-    if (!data.isSuccess) {
-      const fromDetails = data.error?.details?.map((d) => d.value).join("; ");
-      const fromErrors = data.errors?.map((e) => e.message).join("; ");
-      const msg =
-        data.error?.message || fromDetails || fromErrors || "Request failed.";
-      throw new Error(msg);
-    }
-    return (data.value ?? null) as T | null;
-  }
+export type FilterRule = {
+  field: string;
+  op:
+    | "eq"
+    | "neq"
+    | "lt"
+    | "lte"
+    | "gt"
+    | "gte"
+    | "contains"
+    | "startsWith"
+    | "endsWith"
+    | "in"
+    | "nin";
+  value: string;
+};
 
-  if (isProblem(data)) {
-    const msg = data.title || data.detail || "Request failed.";
-    throw new Error(msg);
-  }
-  return data as T;
-}
+export type FilterRuleWire = {
+  field: string;
+  op: string;
+  value: string;
+};
 
 export type PagedList<T> = {
   items: T[];
   page: number;
   pageSize: number;
   total: number;
+  totalPages: number;
 };
+
+export const toWireFilters = (
+  filters?: FilterRule[]
+): FilterRuleWire[] | undefined =>
+  filters?.length
+    ? filters.map((f) => ({
+        field: f.field,
+        op: f.op, // <- widen to string is fine
+        value: Array.isArray(f.value) ? f.value.join(",") : String(f.value),
+      }))
+    : undefined;

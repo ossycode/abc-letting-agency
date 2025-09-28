@@ -1,22 +1,3 @@
-import { LandlordDto } from "@/api/sdk";
-
-export type LandlordQuery = {
-  page?: number;
-  pageSize?: number;
-  sortBy?: string;
-  sortDesc?: boolean;
-  search?: string;
-  searchFields?: string[];
-  filters?: Array<{ field: string; op: string; value: string }>;
-};
-
-export type LandlordPaged = {
-  items: LandlordDto[];
-  page: number;
-  pageSize: number;
-  total: number;
-};
-
 export type Landlord = {
   id: string;
   name: string | null;
@@ -30,3 +11,31 @@ export type Landlord = {
   updatedAt?: string | null;
   // add any extras your DTO returns (stats, counts, etc)
 };
+
+export type LandlordDto = {
+  id: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  propertyCount: number;
+  tenancyCount: number;
+  invoiceCount: number;
+  createdAt: string; // ISO
+  updatedAt?: string | null; // ISO
+  address?: string | null;
+  notes?: string | null;
+  bankIban?: string;
+  bankSort?: string;
+};
+
+export type CreateLandlordRequest = {
+  name: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  notes?: string;
+  bankIban?: string;
+  bankSort?: string;
+};
+
+export type UpdateLandlordRequest = Partial<CreateLandlordRequest>;

@@ -3,22 +3,17 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Dropdown } from "../dropdown/Dropdown";
 import { DropdownItem } from "../dropdown/DropdownItem";
 import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
-import {
-  getApiUserQueryKey,
-  postApiAuthLogoutMutation,
-} from "@/api/sdk/@tanstack/react-query.gen";
+import { useCurrentUser } from "@/hooks/user/useCurrentUser";
+import { useLogout } from "@/hooks/auth/useAuth";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const toggleDropdown = () => setIsOpen((v) => !v);
   const closeDropdown = () => setIsOpen(false);
 
-  const { me, isLoading, isAuthenticated } = useAuth();
+  const { me, isLoading, isAuthenticated } = useCurrentUser();
 
   const router = useRouter();
-  const qc = useQueryClient();
 
   useEffect(() => {
     const handle = () => setIsOpen(false);
@@ -48,20 +43,15 @@ export default function UserDropdown() {
     );
   }, [me]);
 
-  const logout = useMutation({
-    ...postApiAuthLogoutMutation(),
-    onSettled: async () => {
-      // invalidate/remove cached "me"
-      await qc.invalidateQueries({ queryKey: getApiUserQueryKey() });
-      // optional hard clear:
-      // qc.removeQueries({ queryKey: getApiUserQueryKey() });
+  const logout = useLogout({
+    onSuccess: () => {
       router.replace("/login");
       router.refresh();
     },
   });
 
   const signOut = async () => {
-    await logout.mutateAsync({});
+    await logout.mutateAsync();
   };
 
   return (

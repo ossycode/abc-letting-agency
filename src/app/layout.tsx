@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
-import "@/api/config";
 import Providers from "./providers";
 import { Toaster } from "react-hot-toast";
-import ClientConfig from "./ClientConfig";
+import AuthRedirector from "./AuthRedirector";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -24,9 +23,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${outfit.className}antialiased`}>
-        <ClientConfig />
-        <Providers>{children}</Providers>
+      <body className={`${outfit.className} antialiased`}>
+        <Providers>
+          <AuthRedirector />
+          {children}
+        </Providers>
         <Toaster
           toastOptions={{
             duration: 6000,

@@ -1,8 +1,6 @@
 "use client";
 
 import { useSidebar } from "@/context/SidebarContext";
-// import Image from "next/image";
-// import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import NotificationDropdown from "../ui/header/NotificationDropdown";
 import UserDropdown from "../ui/header/UserDropdown";

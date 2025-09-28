@@ -1,11 +1,10 @@
 "use client";
 
-import { getApiLandlordByIdOptions } from "@/api/sdk/@tanstack/react-query.gen";
 import { Landlord } from "@/types/landlord";
-import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import Link from "next/link";
+import { useLandlord } from "@/hooks/landlord/landlord";
 
 const SectionCard = ({
   title,
@@ -56,11 +55,13 @@ export default function LandlordDetailView() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
 
-  const { data, isLoading, isError, error } = useQuery(
-    getApiLandlordByIdOptions({
-      path: { id }, // depends on your generated type; usually { path: { id } }
-    })
-  );
+  // const { data, isLoading, isError, error } = useQuery(
+  //   getApiLandlordByIdOptions({
+  //     path: { id }, // depends on your generated type; usually { path: { id } }
+  //   })
+  // );
+
+  const { data, isLoading, isError, error } = useLandlord(id);
 
   const landlord = useMemo(() => (data ?? null) as Landlord | null, [data]);
 

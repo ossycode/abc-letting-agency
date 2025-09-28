@@ -1,14 +1,8 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { FilterRule, LandlordDto } from "@/api/sdk";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDebounced } from "@/hooks/useDebounced";
-import {
-  deleteApiLandlordByIdMutation,
-  getApiLandlordOptions,
-  getApiLandlordQueryKey,
-} from "@/api/sdk/@tanstack/react-query.gen";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import Button from "../ui/Button";
 import Link from "next/link";
 import TableDropdown from "../ui/TableDropdown";
@@ -17,18 +11,21 @@ import { stopPropagation } from "@/helper";
 import { useModal } from "@/hooks/useModal";
 import toast from "react-hot-toast";
 import WarningModal from "../ui/modal/WarningModal";
+import { LandlordDto } from "@/types/landlord";
+import { FilterRuleWire } from "@/types/shared";
+import { useDeleteLandlord, useLandlords } from "@/hooks/landlord/landlord";
 
-type filterOption = "any" | "yes" | "no";
+type FilterOption = "any" | "yes" | "no";
 const FilterDropdown: React.FC<{
   open: boolean;
   setShowFilter: (show: boolean) => void;
-  onApply: (filters: FilterRule[]) => void;
+  onApply: (filters: FilterRuleWire[]) => void;
 }> = ({ open, onApply, setShowFilter }) => {
-  const ref = React.useRef<HTMLDivElement>(null);
-  const [hasEmail, setHasEmail] = React.useState<filterOption>("any");
-  const [hasPhone, setHasPhone] = React.useState<"any" | "yes" | "no">("any");
+  const ref = useRef<HTMLDivElement>(null);
+  const [hasEmail, setHasEmail] = useState<FilterOption>("any");
+  const [hasPhone, setHasPhone] = useState<FilterOption>("any");
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node))
         setShowFilter(false);
@@ -38,7 +35,7 @@ const FilterDropdown: React.FC<{
   }, [open, setShowFilter]);
 
   const apply = () => {
-    const fs: FilterRule[] = [];
+    const fs: FilterRuleWire[] = [];
     if (hasEmail !== "any") {
       fs.push({
         field: "email",
@@ -90,7 +87,7 @@ const FilterDropdown: React.FC<{
             </label>
             <select
               value={hasEmail}
-              onChange={(e) => setHasEmail(e.target.value as filterOption)}
+              onChange={(e) => setHasEmail(e.target.value as FilterOption)}
               className="h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-sm text-gray-800 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
             >
               <option value="any">Any</option>
@@ -105,7 +102,7 @@ const FilterDropdown: React.FC<{
             </label>
             <select
               value={hasPhone}
-              onChange={(e) => setHasPhone(e.target.value as filterOption)}
+              onChange={(e) => setHasPhone(e.target.value as FilterOption)}
               className="h-10 w-full rounded-lg border border-gray-300 bg-transparent px-3 text-sm text-gray-800 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
             >
               <option value="any">Any</option>
@@ -142,45 +139,27 @@ function LandlordListTable() {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounced(search, 400);
 
-  const [filters, setFilters] = useState<FilterRule[] | undefined>();
+  const [filters, setFilters] = useState<FilterRuleWire[] | undefined>();
   const [showFilter, setShowFilter] = useState(false);
 
   const [landlordToDelete, setLandlordToDelete] = useState<LandlordDto>();
 
-  // server query (let the helper control types)
-  // const { data, isLoading, isError, error } = useQuery(
-  //   getApiLandlordOptions({
-  //     query: {
-  //       Page: page,
-  //       PageSize: pageSize,
-  //       SortBy: sortBy,
-  //       SortDesc: sortDesc,
-  //       Search: debouncedSearch || undefined,
-  //       SearchFields: ["name", "email", "phone"],
-  //       filters, // FilterRule[] goes straight through
-  //     },
-  //   })
-  // );
-
-  const listOpts = React.useMemo(
-    () => ({
-      query: {
-        Page: page,
-        PageSize: pageSize,
-        SortBy: sortBy,
-        SortDesc: sortDesc,
-        Search: debouncedSearch || undefined,
-        SearchFields: ["name", "email", "phone"],
-        filters,
+  const { data, isLoading, isError, error } = useLandlords(
+    {
+      opts: {
+        page,
+        pageSize,
+        sortBy,
+        sortDesc,
+        search: debouncedSearch || undefined,
+        searchFields: ["name", "email", "phone"],
       },
-    }),
-    [page, pageSize, sortBy, sortDesc, debouncedSearch, filters]
+      filters,
+    },
+    { staleTime: 30_000 }
   );
 
-  const { data, isLoading, isError, error } = useQuery(
-    getApiLandlordOptions(listOpts)
-  );
-
+  const deleteLandlord = useDeleteLandlord();
   const router = useRouter();
   const items = useMemo(() => data?.items ?? [], [data?.items]);
   const total = data?.total ?? 0;
@@ -191,35 +170,18 @@ function LandlordListTable() {
 
   const deleteModalControl = useModal();
 
-  const qc = useQueryClient();
-
-  const delMutation = useMutation({
-    // your hey-api helper returns a UseMutationOptions with mutationFn
-    ...deleteApiLandlordByIdMutation(),
-
-    // add/override callbacks here
-    onSuccess: async () => {
-      await qc.invalidateQueries({
-        queryKey: getApiLandlordQueryKey(listOpts),
-      });
-      deleteModalControl.closeModal();
-      toast.success("Landlord deleted successfully");
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (err: any) => {
-      toast.error(err?.message ?? "Failed to delete landlord");
-    },
-  });
-
-  const isDeleting = delMutation.isPending;
+  const isDeleting = deleteLandlord.isPending;
 
   const handleDelete = async () => {
     if (!landlordToDelete?.id) return;
-
-    await delMutation.mutateAsync({
-      path: { id: String(landlordToDelete.id) },
-      headers: { "Idempotency-Key": crypto.randomUUID() },
-    });
+    try {
+      await deleteLandlord.mutateAsync(String(landlordToDelete.id));
+      deleteModalControl.closeModal();
+      toast.success("Landlord deleted successfully");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      toast.error(err?.message ?? "Failed to delete landlord");
+    }
   };
 
   const toggleSort = (key: SortKey) => {

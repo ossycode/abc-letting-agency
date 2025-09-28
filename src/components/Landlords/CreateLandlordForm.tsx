@@ -5,12 +5,13 @@ import React, { useState } from "react";
 import Button from "../ui/Button";
 import Label from "../ui/Label";
 import Input from "../ui/InputField";
-import { postApiLandlord } from "@/api/sdk";
 import TextArea from "../ui/TextArea";
 import toast from "react-hot-toast";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useCreateLandlord } from "@/hooks/landlord/landlord";
+import { applyProblemDetailsToForm } from "@/helper";
 
 const landlordSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(200),
@@ -28,6 +29,8 @@ type Props = { onSuccess?: (id?: string) => void };
 
 function CreateLandlordForm({ onSuccess }: Props) {
   const [serverError, setServerError] = useState<string | null>(null);
+
+  const post = useCreateLandlord();
 
   const {
     handleSubmit,
@@ -53,51 +56,22 @@ function CreateLandlordForm({ onSuccess }: Props) {
     setServerError(null);
 
     try {
-      const { data, error, response } = await postApiLandlord<false>({
-        // hey-api expects `data` as the JSON body
-        body: {
-          name: values.name,
-          email: values.email,
-          phone: values.phone,
-          address: values.address,
-          bankIban: values.bankIban || null,
-          bankSort: values.bankSort || null,
-          notes: values.notes || null,
-        },
-        headers: { "Idempotency-Key": crypto.randomUUID() },
+      const created = await post.mutateAsync({
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        address: values.address,
+        bankIban: values.bankIban,
+        bankSort: values.bankSort,
+        notes: values.notes,
       });
-
-      if (!response.ok) {
-        // Try mapping ProblemDetails-style validation into field errors
-        const problem = (error as any) ?? (data as any);
-        const details: Record<string, string> | undefined =
-          problem?.errors || problem?.Extensions?.errors;
-
-        if (details) {
-          // keys like "email", "name", etc.
-          Object.entries(details).forEach(([key, message]) => {
-            setError(key as keyof LandlordForm, {
-              type: "server",
-              message: Array.isArray(message) ? message[0] : String(message),
-            });
-          });
-          return;
-        }
-
-        setServerError(
-          problem?.title || problem?.message || "Failed to create landlord."
-        );
-        return;
-      }
-
-      // success: optional id if your API returns it
-      const created = data as { id?: string } | undefined;
 
       reset();
       onSuccess?.(created?.id);
-      toast.success("Landlord created successfuly!");
-    } catch (e: any) {
-      setServerError(e?.message ?? "Something went wrong.");
+      toast.success("Landlord created successfully!");
+    } catch (err: any) {
+      const top = applyProblemDetailsToForm(err, setError);
+      setServerError(top ?? "Something went wrong.");
       toast.error("Something went wrong.");
     }
   };

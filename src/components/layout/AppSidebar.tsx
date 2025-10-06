@@ -156,7 +156,8 @@ export const supportNav: NavItem[] = [
 ];
 
 const AppSidebar: React.FC = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  // const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const { isExpanded, isMobileOpen } = useSidebar();
 
   const pathname = usePathname();
 
@@ -280,9 +281,8 @@ const AppSidebar: React.FC = () => {
                     ? "menu-item-parent-active"
                     : "menu-item-inactive"
                 } ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "lg:justify-start"
+                  // !isExpanded && !isHovered
+                  !isExpanded ? "lg:justify-center" : "lg:justify-start"
                 }`}
               >
                 {/* <span
@@ -302,7 +302,7 @@ const AppSidebar: React.FC = () => {
                 >
                   {nav.icon}
                 </span>
-                {(isExpanded || isHovered || isMobileOpen) && (
+                {(isExpanded || isMobileOpen) && (
                   // <span className={`menu-item-text`}>{nav.name}</span>
                   <span
                     className={`menu-item-text ${
@@ -314,7 +314,7 @@ const AppSidebar: React.FC = () => {
                     {nav.name}
                   </span>
                 )}
-                {(isExpanded || isHovered || isMobileOpen) && (
+                {(isExpanded || isMobileOpen) && (
                   <ChevronDownIcon
                     className={`ml-auto w-5 h-5 transition-transform duration-200  ${
                       openSubmenu?.type === menuType &&
@@ -356,13 +356,13 @@ const AppSidebar: React.FC = () => {
                   >
                     {nav.icon}
                   </span>
-                  {(isExpanded || isHovered || isMobileOpen) && (
+                  {(isExpanded || isMobileOpen) && (
                     <span className={`menu-item-text`}>{nav.name}</span>
                   )}
                 </Link>
               )
             )}
-            {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
+            {nav.subItems && (isExpanded || isMobileOpen) && (
               <div
                 ref={(el) => {
                   subMenuRefs.current[`${menuType}-${index}`] = el;
@@ -435,21 +435,21 @@ const AppSidebar: React.FC = () => {
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"
-            : isHovered
-            ? "w-[290px]"
-            : "w-[90px]"
+            : // : isHovered
+              // ? "w-[290px]"
+              "w-[90px]"
         }
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
-      onMouseEnter={() => !isExpanded && setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      // onMouseEnter={() => !isExpanded && setIsHovered(true)}
+      // onMouseLeave={() => setIsHovered(false)}
     >
       <div
         className={`py-8 flex  ${
-          !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+          !isExpanded ? "lg:justify-center" : "justify-start"
         }`}
       >
-        {isExpanded || isHovered || isMobileOpen ? (
+        {isExpanded || isMobileOpen ? (
           <>
             {/* <Image
                 className="dark:hidden"
@@ -477,44 +477,30 @@ const AppSidebar: React.FC = () => {
             <div>
               <h2
                 className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
+                  !isExpanded ? "lg:justify-center" : "justify-start"
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Main Menu"
-                ) : (
-                  <HorizontaLDots />
-                )}
+                {isExpanded || isMobileOpen ? "Main Menu" : <HorizontaLDots />}
               </h2>
               {renderMenuItems(mainNav, "main")}
             </div>
             <div>
               <h2
                 className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
+                  !isExpanded ? "lg:justify-center" : "justify-start"
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Finance"
-                ) : (
-                  <HorizontaLDots />
-                )}
+                {isExpanded || isMobileOpen ? "Finance" : <HorizontaLDots />}
               </h2>
               {renderMenuItems(financeNav, "finance")}
             </div>
             <div>
               <h2
                 className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
+                  !isExpanded ? "lg:justify-center" : "justify-start"
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
+                {isExpanded || isMobileOpen ? (
                   "Reports & Admin"
                 ) : (
                   <HorizontaLDots />
@@ -525,16 +511,10 @@ const AppSidebar: React.FC = () => {
             <div>
               <h2
                 className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
+                  !isExpanded ? "lg:justify-center" : "justify-start"
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Support"
-                ) : (
-                  <HorizontaLDots />
-                )}
+                {isExpanded || isMobileOpen ? "Support" : <HorizontaLDots />}
               </h2>
               {renderMenuItems(supportNav, "support")}
             </div>

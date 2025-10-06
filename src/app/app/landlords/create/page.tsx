@@ -2,7 +2,7 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import CreateLandlordForm from "@/components/Landlords/CreateLandlordForm";
 import React from "react";
 
-const page = () => {
+const CreateLandlordPage = () => {
   const firstParent = { title: "Landlords", href: "/app/landlords" };
 
   return (
@@ -13,4 +13,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default CreateLandlordPage;

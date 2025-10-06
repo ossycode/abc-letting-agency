@@ -39,6 +39,5 @@ export function applyProblemDetailsToForm(
 
 export function pickHome(resp: LoginResponse) {
   if (resp.isPlatform) return "/portal";
-  // if (resp.needsAgencySelection) return "/app";
-  return "/app"; // agency -> app
+  return "/app";
 }

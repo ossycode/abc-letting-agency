@@ -39,18 +39,26 @@ const SigninForm = () => {
         email: emailTrim,
         password,
       });
-
-      console.log(res);
       if (res) {
         const destDefault = pickHome(res);
-
         const isPortalUser = res.isPlatform;
         const okReturnTo =
           returnTo &&
           ((isPortalUser && returnTo.startsWith("/portal")) ||
             (!isPortalUser && returnTo.startsWith("/app")));
+        const nextPath = okReturnTo ? returnTo : destDefault;
 
-        router.replace(destDefault);
+        if (process.env.NODE_ENV === "production" && !res.isPlatform) {
+          // Prefer a single, authoritative field from the API like selectedAgencySlug
+          const slug = res.selectedAgencyId ?? res.agencies?.[0]?.slug;
+          if (slug) {
+            window.location.href = `https://${slug}.cvedup.com${nextPath}`;
+            return; // stop because we're navigating cross-origin
+          }
+        }
+
+        // dev or no slug -> let middleware handle it (or stay on same host)
+        router.replace(nextPath);
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {

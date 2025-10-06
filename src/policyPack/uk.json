@@ -1,0 +1,55 @@
+{
+  "id": "uk",
+  "label": "United Kingdom",
+  "currency": "GBP",
+  "dateFormat": "dd/MM/yyyy",
+  "tax": { "name": "VAT", "rate": 0.2, "appliesToFees": true },
+  "trust": { "required": true, "officeVsClientTransfers": "restricted" },
+
+  "deposit": {
+    "label": "Deposit",
+    "maxMonthlyCap": 5,
+    "calcMax": "deposit.max = roundUp(weeklyRent * 5, 0.01)",
+    "deadlines": { "protectDays": 30, "infoDays": 30 },
+    "prescribedDocs": ["uk.pi.depositInfo", "uk.doc.htr"],
+    "registerNotes": "Record scheme name/number & certificate file"
+  },
+
+  "arrears": {
+    "ladderDays": [1, 7, 14, 21, 28],
+    "lateFeeRule": {
+      "type": "fixedOrPercent",
+      "fixed": 0,
+      "percentAnnual": 0.0,
+      "notes": "Typically no late fee or interest unless agreement allows."
+    }
+  },
+
+  "notices": [
+    { "code": "uk.s8", "label": "Section 8", "minDays": 14 },
+    { "code": "uk.s21", "label": "Section 21", "minDays": 60 }
+  ],
+
+  "requiredCompliance": [
+    { "code": "GAS", "label": "Gas Safety", "frequencyDays": 365 },
+    {
+      "code": "EICR",
+      "label": "Electrical Installation Condition Report",
+      "frequencyDays": 1825
+    },
+    { "code": "SMKCO", "label": "Smoke & CO Alarms", "frequencyDays": 365 },
+    { "code": "EPC", "label": "EPC", "frequencyDays": "365 * 10" }
+  ],
+
+  "documentTemplates": {
+    "lease": "uk.ast.v1",
+    "pi": "uk.pi.depositInfo",
+    "howToRent": "uk.doc.htr",
+    "increaseNotice": "uk.notice.increase",
+    "s8": "uk.notice.s8",
+    "s21": "uk.notice.s21",
+    "landlordStatement": "uk.doc.landlordStatement",
+    "tenantArrearsReminder": "uk.comms.arrears.reminder",
+    "tenantArrearsFinal": "uk.comms.arrears.final"
+  }
+}

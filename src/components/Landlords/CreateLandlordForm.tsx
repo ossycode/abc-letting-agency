@@ -174,7 +174,7 @@ function CreateLandlordForm({ onSuccess }: Props) {
                 render={({ field }) => (
                   <TextArea
                     rows={4}
-                    value={field.value ?? ""}
+                    defaultValue={field.value ?? ""}
                     onChange={field.onChange}
                     placeholder="Anything the team should know…"
                   />

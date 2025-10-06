@@ -1,3 +1,5 @@
+import { LoginResponse } from "./types/auth";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const stopPropagation = (e: React.MouseEvent | React.KeyboardEvent) => {
   e.stopPropagation();
@@ -33,4 +35,10 @@ export function applyProblemDetailsToForm(
 
   // generic top-level message
   return data?.title || data?.message || ax?.message || "Request failed.";
+}
+
+export function pickHome(resp: LoginResponse) {
+  if (resp.isPlatform) return "/portal";
+  // if (resp.needsAgencySelection) return "/app";
+  return "/app"; // agency -> app
 }

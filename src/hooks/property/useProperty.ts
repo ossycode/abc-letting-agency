@@ -7,11 +7,21 @@ import {
 } from "@/types/property";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export function useProperty(id: string, enabled = true) {
+export function useProperty(
+  id?: string,
+  options?: {
+    enabled?: boolean;
+  }
+) {
+  // return useQuery<PropertyDto>({
+  //   queryKey: propertyKeys.detail(id),
+  //   queryFn: () => propertyApi.getById(id),
+  //   enabled: !!id && (options?.enabled ?? true),
+  // });
   return useQuery<PropertyDto>({
-    queryKey: propertyKeys.detail(id),
-    queryFn: () => propertyApi.getById(id),
-    enabled,
+    queryKey: id ? propertyKeys.detail(id) : propertyKeys.detail("nil"),
+    queryFn: async () => propertyApi.getById(id as string),
+    enabled: !!id && (options?.enabled ?? true),
   });
 }
 

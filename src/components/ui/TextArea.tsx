@@ -1,63 +1,82 @@
-import React from "react";
+import React, { forwardRef } from "react";
+import clsx from "clsx";
 
-interface TextareaProps {
-  placeholder?: string; // Placeholder text
-  rows?: number; // Number of rows
-  value?: string; // Current value
-  onChange?: (value: string) => void; // Change handler
-  className?: string; // Additional CSS classes
-  disabled?: boolean; // Disabled state
-  error?: boolean; // Error state
-  hint?: string; // Hint text to display
-}
-
-const TextArea: React.FC<TextareaProps> = ({
-  placeholder = "Enter your message", // Default placeholder
-  rows = 3, // Default number of rows
-  value = "", // Default value
-  onChange, // Callback for changes
-  className = "", // Additional custom styles
-  disabled = false, // Disabled state
-  error = false, // Error state
-  hint = "", // Default hint text
-}) => {
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (onChange) {
-      onChange(e.target.value);
-    }
-  };
-
-  let textareaClasses = `w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs focus:outline-hidden ${className} `;
-
-  if (disabled) {
-    textareaClasses += ` bg-gray-100 opacity-50 text-gray-500 border-gray-300 cursor-not-allowed opacity40 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700`;
-  } else if (error) {
-    textareaClasses += ` bg-transparent  border-gray-300 focus:border-error-300 focus:ring-3 focus:ring-error-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-error-800`;
-  } else {
-    textareaClasses += ` bg-transparent text-gray-900 dark:text-gray-300 text-gray-900 border-gray-300 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800`;
-  }
-
-  return (
-    <div className="relative">
-      <textarea
-        placeholder={placeholder}
-        rows={rows}
-        defaultValue={value}
-        onChange={handleChange}
-        disabled={disabled}
-        className={textareaClasses}
-      />
-      {hint && (
-        <p
-          className={`mt-2 text-sm ${
-            error ? "text-error-500" : "text-gray-500 dark:text-gray-400"
-          }`}
-        >
-          {hint}
-        </p>
-      )}
-    </div>
-  );
+export type TextAreaProps = Omit<
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+  "rows"
+> & {
+  error?: boolean;
+  hint?: string;
+  rows?: number; // optional, with a default
+  /** Optional convenience: fires with the string value only */
+  onValueChange?: (value: string) => void;
 };
 
+const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
+  (
+    {
+      className,
+      disabled = false,
+      error = false,
+      hint,
+      id,
+      rows = 3,
+      onChange,
+      onValueChange,
+      ...props
+    },
+    ref
+  ) => {
+    const base =
+      "w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs " +
+      "transition-colors focus:outline-none " +
+      "bg-transparent text-gray-900 placeholder-gray-400 border-gray-300 " +
+      "focus:border-brand-300 focus:ring-2 focus:ring-brand-500/10 " +
+      "dark:bg-gray-900 dark:text-white/90 dark:placeholder-gray-400 dark:border-gray-700 " +
+      "dark:focus:border-brand-800";
+
+    const state = clsx({
+      "opacity-50 cursor-not-allowed bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400":
+        disabled && !error,
+      "border-error-500 focus:border-error-500 focus:ring-error-500/15 dark:border-error-500 dark:focus:border-error-400":
+        error,
+    });
+
+    const hintId = hint ? `${id ?? "textarea"}-hint` : undefined;
+
+    const handleChange: React.ChangeEventHandler<HTMLTextAreaElement> = (e) => {
+      onValueChange?.(e.target.value);
+      onChange?.(e);
+    };
+
+    return (
+      <div className="relative">
+        <textarea
+          ref={ref}
+          id={id}
+          rows={rows}
+          disabled={disabled}
+          aria-invalid={error || undefined}
+          aria-describedby={hintId}
+          className={clsx(base, state, className)}
+          onChange={handleChange}
+          {...props}
+        />
+        {hint && (
+          <p
+            id={hintId}
+            className={clsx(
+              "mt-1.5 text-xs",
+              error ? "text-error-500" : "text-gray-500 dark:text-gray-400"
+            )}
+          >
+            {hint}
+          </p>
+        )}
+      </div>
+    );
+  }
+);
+
+TextArea.displayName = "TextArea";
 export default TextArea;

@@ -2,30 +2,32 @@ import { FilterRuleWire, QueryOptions } from "./shared";
 
 export type PropertyDto = {
   id: string;
-  code?: string | null;
+  code: string;
   addressLine1: string;
-  addressLine2?: string | null;
-  city?: string | null;
-  postcode?: string | null;
-  bedrooms?: number | null;
-  bathrooms?: number | null;
-  furnished?: boolean | null;
-  availableFrom?: string | null; // ISO
+  addressLine2?: string;
+  city: string;
+  postcode: string;
+  bedrooms: number;
+  bathrooms: number;
+  furnished?: boolean;
+  availableFrom?: string; // ISO
   landlordId: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
+  notes?: string;
 };
 
 export type CreatePropertyRequest = {
   addressLine1: string;
-  addressLine2?: string | null;
-  city?: string | null;
-  postcode?: string | null;
-  bedrooms?: number | null;
-  bathrooms?: number | null;
-  furnished?: boolean | null;
-  availableFrom?: string | null;
+  addressLine2?: string;
+  city: string;
+  postcode: string;
+  bedrooms: number;
+  bathrooms: number;
+  furnished?: boolean;
+  availableFrom?: string;
   landlordId: string;
+  notes?: string;
 };
 
 export type UpdatePropertyRequest = Partial<CreatePropertyRequest>;

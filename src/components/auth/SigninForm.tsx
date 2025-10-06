@@ -8,6 +8,7 @@ import Checkbox from "../ui/Checkbox";
 import { useRouter, useSearchParams } from "next/navigation";
 import Button from "../ui/Button";
 import { useLogin } from "@/hooks/auth/useAuth";
+import { pickHome } from "@/helper";
 
 const SigninForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,11 +35,23 @@ const SigninForm = () => {
     }
 
     try {
-      await login.mutateAsync({
+      const res = await login.mutateAsync({
         email: emailTrim,
         password,
       });
-      router.replace(returnTo);
+
+      console.log(res);
+      if (res) {
+        const destDefault = pickHome(res);
+
+        const isPortalUser = res.isPlatform;
+        const okReturnTo =
+          returnTo &&
+          ((isPortalUser && returnTo.startsWith("/portal")) ||
+            (!isPortalUser && returnTo.startsWith("/app")));
+
+        router.replace(destDefault);
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       setErrMsg(e?.message ?? "Unable to sign in. Please try again.");

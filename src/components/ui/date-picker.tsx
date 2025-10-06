@@ -13,6 +13,8 @@ type PropsType = {
   mode?: "single" | "multiple" | "range" | "time";
   onChange?: Hook | Hook[];
   defaultDate?: DateOption;
+  minDate?: DateOption;
+  maxDate?: DateOption;
   label?: string;
   placeholder?: string;
 };
@@ -23,6 +25,8 @@ export default function DatePicker({
   onChange,
   label,
   defaultDate,
+  minDate,
+  maxDate,
   placeholder,
 }: PropsType) {
   useEffect(() => {
@@ -33,6 +37,8 @@ export default function DatePicker({
       dateFormat: "Y-m-d",
       defaultDate,
       onChange,
+      minDate,
+      maxDate,
     });
 
     return () => {
@@ -40,7 +46,7 @@ export default function DatePicker({
         flatPickr.destroy();
       }
     };
-  }, [mode, onChange, id, defaultDate]);
+  }, [mode, onChange, id, defaultDate, minDate, maxDate]);
 
   return (
     <div>

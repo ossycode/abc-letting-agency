@@ -1,5 +1,5 @@
 import { axiosClient } from "@/lib/axiosClient";
-import { LoginRequest, RegisterRequest } from "@/types/auth";
+import { LoginRequest, LoginResponse, RegisterRequest } from "@/types/auth";
 import { ApiResult } from "@/types/shared";
 
 /**
@@ -17,7 +17,7 @@ export const authApi = {
   },
 
   login: async (payload: LoginRequest) => {
-    const { data } = await axiosClient.post<ApiResult<unknown>>(
+    const { data } = await axiosClient.post<LoginResponse>(
       "/api/auth/login",
       payload
     );

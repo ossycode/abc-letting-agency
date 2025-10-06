@@ -5,12 +5,14 @@ interface BreadcrumbProps {
   pageTitle: string;
   firstParent?: { title: string; href: string };
   secondParent?: { title: string; href: string };
+  showPageTitle?: boolean;
 }
 
 const PageBreadcrumb: React.FC<BreadcrumbProps> = ({
   pageTitle,
   firstParent,
   secondParent,
+  showPageTitle = true,
 }) => {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
@@ -18,7 +20,7 @@ const PageBreadcrumb: React.FC<BreadcrumbProps> = ({
         className="text-xl font-semibold text-gray-800 dark:text-white/90"
         x-text="pageName"
       >
-        {pageTitle}
+        {showPageTitle && pageTitle}
       </h2>
       <nav>
         <ol className="flex items-center gap-1.5">

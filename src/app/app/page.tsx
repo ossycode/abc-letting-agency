@@ -1,8 +1,7 @@
-import LettingsDashboard from "@/components/dashboard/LettingsDashboard";
-import React from "react";
+import { redirect } from "next/navigation";
 
 const AppPage = () => {
-  return <LettingsDashboard />;
+  return redirect("/app/overview");
 };
 
 export default AppPage;

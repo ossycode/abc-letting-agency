@@ -3,11 +3,9 @@ import React, { useEffect, useRef, useCallback, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Box as BoxCubeIcon,
   Calendar as CalendarIcon,
   MessageSquare as ChatIcon,
   ChevronDown as ChevronDownIcon,
-  FileText as DocsIcon,
   LayoutGrid as GridIcon,
   MoreHorizontal as HorizontaLDots,
   Mail as MailIcon,
@@ -29,289 +27,144 @@ type NavItem = {
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
-const navItems: NavItem[] = [
-  {
-    icon: <GridIcon />,
-    name: "Dashboard",
-    path: "/app",
-    // subItems: [
-    //   { name: "Overview", path: "/app" },
-    //   { name: "Arrears Monitor", path: "/dashboard/arrears" },
-    //   { name: "Expiring Tenancies", path: "/dashboard/expiries", new: true },
-    //   { name: "Worklist", path: "/dashboard/worklist" },
-    // ],
-  },
+// === MAIN ===
+export const mainNav: NavItem[] = [
+  { icon: <GridIcon />, name: "Dashboard", path: "/app/overview" },
 
   {
     icon: <UserCircleIcon />,
-    name: "Landlords",
-    path: "/app/landlords",
-    // subItems: [
-    //   { name: "All Landlords", path: "/app/landlords" },
-    //   { name: "Statements", path: "/app/landlords/statements" },
-    //   { name: "Communication Log", path: "/app/landlords/comms" },
-    //   { name: "Documents", path: "/app/landlords/documents" },
-    // ],
-  },
-
-  {
-    icon: <UserCircleIcon />,
-    name: "Tenants",
+    name: "Landlords Management",
     subItems: [
-      { name: "All Tenants", path: "#" },
-      { name: "Arrears", path: "#" },
-      { name: "Documents", path: "#" },
-      { name: "Status Tracking", path: "#" },
-    ],
-  },
-
-  {
-    icon: <GridIcon />,
-    name: "Properties",
-    subItems: [
-      { name: "All Properties", path: "/app/properties" },
-      { name: "Managed", path: "#" },
-      { name: "Availability", path: "#" },
-      { name: "Maintenance History", path: "#" },
-      { name: "Documents", path: "#" },
+      { name: "All Landlords", path: "/app/landlords" },
+      { name: "Portfolios", path: "/app/landlords/portfolios" },
+      { name: "Bank Details & Payouts", path: "/app/landlords/payouts" },
+      { name: "Statements", path: "/app/landlords/statements" },
+      { name: "Communication Log", path: "/app/landlords/comms" },
+      { name: "Documents", path: "/app/landlords/documents" },
     ],
   },
 
   {
     icon: <TaskIcon />,
-    name: "Tenancies",
+    name: "Tenancy Management",
     subItems: [
-      { name: "Active", path: "#" },
-      { name: "Expiring Soon", path: "#" },
-      { name: "Deposit Ledger", path: "#" },
-      { name: "Documents", path: "#" },
+      { name: "Onboarding Wizard", path: "/app/tenancy/onboarding" },
+      { name: "Tenancies", path: "/app/tenancy/tenancies" },
+      { name: "Tenants", path: "/app/tenancy/tenants" },
+      { name: "Arrears (Ops View)", path: "/app/tenancy/arrears" },
+      { name: "Compliance Checks", path: "/app/tenancy/compliance" },
+      { name: "Documents", path: "/app/tenancy/documents" },
+      { name: "Notes / Updates", path: "/app/tenancy/notes" },
     ],
   },
+
   {
-    icon: <TableIcon />,
-    name: "Rent Book",
+    icon: <GridIcon />,
+    name: "Properties Management",
     subItems: [
-      { name: "Payments", path: "#" },
-      { name: "Allocate Receipts", path: "#" },
-      { name: "Arrears", path: "#" },
-      { name: "Receipts", path: "#" },
+      { name: "All Properties", path: "/app/properties" },
+      { name: "Managed Properties", path: "/app/properties/managed" },
+      { name: "Availability", path: "/app/properties/availability" },
+      { name: "Maintenance & Jobs", path: "/app/properties/maintenance" },
+      { name: "Inspections", path: "/app/properties/inspections" },
+      { name: "Documents", path: "/app/properties/documents" },
     ],
   },
-  {
-    icon: <BoxCubeIcon />,
-    name: "Money Held",
-    subItems: [
-      { name: "Deposits", path: "#" },
-      { name: "Client Funds", path: "#" },
-      { name: "Reconciliations", path: "#" },
-      { name: "Transfers", path: "#" },
-    ],
-  },
-  {
-    icon: <DocsIcon />,
-    name: "Invoices",
-    subItems: [
-      { name: "Received", path: "#" },
-      { name: "Raised", path: "#" },
-      { name: "Credit Notes", path: "#" },
-      { name: "Aging", path: "#" },
-    ],
-  },
-  {
-    icon: <ChatIcon />,
-    name: "Updates / Notes",
-    subItems: [
-      { name: "All Updates", path: "#" },
-      { name: "By Entity", path: "#" },
-      { name: "Tags", path: "#" },
-    ],
-  },
-  { icon: <CalendarIcon />, name: "Calendar", path: "#" },
-  { icon: <UserCircleIcon />, name: "User Profile", path: "#" },
+
+  { icon: <CalendarIcon />, name: "Calendar", path: "/app/calendar" },
+  { icon: <UserCircleIcon />, name: "User Profile", path: "/app/profile" },
 ];
 
-// === OTHERS (Reports & admin utilities) ===
-const othersItems: NavItem[] = [
+// === FINANCE ===
+export const financeNav: NavItem[] = [
+  {
+    icon: <TableIcon />,
+    name: "Finance",
+    subItems: [
+      { name: "Rent Book", path: "/app/finance/rent-book" },
+      { name: "Payments & Receipts", path: "/app/finance/receipts" },
+      { name: "Allocate Receipts", path: "/app/finance/allocations" },
+      { name: "Arrears (Finance)", path: "/app/finance/arrears" },
+      { name: "Deposits (Money Held)", path: "/app/finance/deposits" },
+      { name: "Landlord Payouts", path: "/app/finance/payouts" },
+      { name: "Reconciliations", path: "/app/finance/reconciliations" },
+      { name: "Transfers", path: "/app/finance/transfers" },
+      {
+        name: "Invoices",
+        path: "/app/finance/invoices", // parent landing / tabs
+        // optional nested tabs if you prefer deeper nesting:
+        // subItems: [
+        //   { name: "Received",     path: "/app/finance/invoices/received" },
+        //   { name: "Raised",       path: "/app/finance/invoices/raised" },
+        //   { name: "Credit Notes", path: "/app/finance/invoices/credit-notes" },
+        //   { name: "Aging",        path: "/app/finance/invoices/aging" },
+        // ],
+      },
+      { name: "Bank Accounts / Feeds", path: "/app/finance/banking" },
+    ],
+  },
+];
+
+// === REPORTS & ADMIN ===
+export const reportsAndAdminNav: NavItem[] = [
   {
     icon: <PieChartIcon />,
     name: "Reports",
     subItems: [
-      { name: "Rent Roll", path: "#" },
-      { name: "Arrears Summary", path: "#" },
-      { name: "Money Held Summary", path: "#" },
-      { name: "Landlord Statements", path: "#" },
-      { name: "Audit Log", path: "#" },
-      { name: "Exports", path: "#" },
+      { name: "Rent Roll", path: "/app/reports/rent-roll" },
+      { name: "Arrears Summary", path: "/app/reports/arrears" },
+      { name: "Money Held Summary", path: "/app/reports/money-held" },
+      { name: "Landlord Statements", path: "/app/reports/statements" },
+      { name: "Property Performance", path: "/app/reports/performance" },
+      { name: "Audit Log", path: "/app/reports/audit" },
+      { name: "Exports", path: "/app/reports/exports" },
     ],
   },
   {
     icon: <PlugInIcon />,
     name: "Administration",
     subItems: [
-      { name: "Users & Roles", path: "#" },
-      { name: "Reference Data", path: "#" },
-      { name: "Integrations", path: "#" },
-      { name: "Backups", path: "#" },
-      { name: "System Health", path: "#" },
+      { name: "Users & Roles", path: "/app/admin/users" },
+      { name: "Reference Data", path: "/app/admin/reference-data" },
+      { name: "Integrations", path: "/app/admin/integrations" },
+      { name: "Templates (Docs/Email)", path: "/app/admin/templates" },
+      { name: "Backups", path: "/app/admin/backups" },
+      { name: "System Health", path: "/app/admin/health" },
     ],
   },
 ];
 
-// === SUPPORT (Comms & inboxes) ===
-const supportItems: NavItem[] = [
-  { icon: <ChatIcon />, name: "Chat", path: "#" },
+// === SUPPORT ===
+export const supportNav: NavItem[] = [
+  { icon: <ChatIcon />, name: "Chat", path: "/app/support/chat" },
   {
     icon: <MailIcon />,
     name: "Email",
     subItems: [
-      { name: "Inbox", path: "#" },
-      { name: "Details", path: "#" },
+      { name: "Inbox", path: "/app/support/email/inbox" },
+      { name: "Details", path: "/app/support/email/details" },
     ],
   },
   {
     icon: <PageIcon />,
     name: "Documents",
     subItems: [
-      { name: "File Manager", path: "#" },
-      { name: "Templates", path: "#" },
+      { name: "File Manager", path: "/app/support/files" },
+      { name: "Templates", path: "/app/support/templates" },
     ],
   },
 ];
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+
   const pathname = usePathname();
 
-  const renderMenuItems = (
-    navItems: NavItem[],
-    menuType: "main" | "support" | "others"
-  ) => (
-    <ul className="flex flex-col gap-4">
-      {navItems.map((nav, index) => (
-        <li key={nav.name}>
-          {nav.subItems ? (
-            <button
-              onClick={() => handleSubmenuToggle(index, menuType)}
-              className={`menu-item group  ${
-                openSubmenu?.type === menuType && openSubmenu?.index === index
-                  ? "menu-item-active"
-                  : "menu-item-inactive"
-              } cursor-pointer ${
-                !isExpanded && !isHovered
-                  ? "lg:justify-center"
-                  : "lg:justify-start"
-              }`}
-            >
-              <span
-                className={` ${
-                  openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? "menu-item-icon-active"
-                    : "menu-item-icon-inactive"
-                }`}
-              >
-                {nav.icon}
-              </span>
-              {(isExpanded || isHovered || isMobileOpen) && (
-                <span className={`menu-item-text`}>{nav.name}</span>
-              )}
-              {(isExpanded || isHovered || isMobileOpen) && (
-                <ChevronDownIcon
-                  className={`ml-auto w-5 h-5 transition-transform duration-200  ${
-                    openSubmenu?.type === menuType &&
-                    openSubmenu?.index === index
-                      ? "rotate-180 text-brand-500"
-                      : ""
-                  }`}
-                />
-              )}
-            </button>
-          ) : (
-            nav.path && (
-              <Link
-                href={nav.path}
-                className={`menu-item group ${
-                  isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
-                }`}
-              >
-                <span
-                  className={`${
-                    isActive(nav.path)
-                      ? "menu-item-icon-active"
-                      : "menu-item-icon-inactive"
-                  }`}
-                >
-                  {nav.icon}
-                </span>
-                {(isExpanded || isHovered || isMobileOpen) && (
-                  <span className={`menu-item-text`}>{nav.name}</span>
-                )}
-              </Link>
-            )
-          )}
-          {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
-            <div
-              ref={(el) => {
-                subMenuRefs.current[`${menuType}-${index}`] = el;
-              }}
-              className="overflow-hidden transition-all duration-300"
-              style={{
-                height:
-                  openSubmenu?.type === menuType && openSubmenu?.index === index
-                    ? `${subMenuHeight[`${menuType}-${index}`]}px`
-                    : "0px",
-              }}
-            >
-              <ul className="mt-2 space-y-1 ml-9">
-                {nav.subItems.map((subItem) => (
-                  <li key={subItem.name}>
-                    <Link
-                      href={subItem.path}
-                      className={`menu-dropdown-item ${
-                        isActive(subItem.path)
-                          ? "menu-dropdown-item-active"
-                          : "menu-dropdown-item-inactive"
-                      }`}
-                    >
-                      {subItem.name}
-                      <span className="flex items-center gap-1 ml-auto">
-                        {subItem.new && (
-                          <span
-                            className={`ml-auto ${
-                              isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge `}
-                          >
-                            new
-                          </span>
-                        )}
-                        {subItem.pro && (
-                          <span
-                            className={`ml-auto ${
-                              isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge `}
-                          >
-                            pro
-                          </span>
-                        )}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </li>
-      ))}
-    </ul>
-  );
-
   const [openSubmenu, setOpenSubmenu] = useState<{
-    type: "main" | "support" | "others";
+    type: "main" | "finance" | "reports" | "support";
     index: number;
   } | null>(null);
+
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>(
     {}
   );
@@ -319,46 +172,66 @@ const AppSidebar: React.FC = () => {
 
   // const isActive = (path: string) => path === pathname;
 
-  const isActive = useCallback((path: string) => path === pathname, [pathname]);
+  const isActive = useCallback(
+    (path: string) => pathname === path || pathname.startsWith(path + "/"),
+    [pathname]
+  );
+
+  const normalize = (s: string) => s.split(/[?#]/)[0].replace(/\/+$/, "");
+
+  const isExactActive = (pathname: string, path: string) =>
+    normalize(pathname) === normalize(path);
+
+  const isInTree = (pathname: string, path: string) => {
+    const cur = normalize(pathname);
+    const base = normalize(path);
+    return cur === base || cur.startsWith(base + "/");
+  };
 
   useEffect(() => {
-    // Check if the current path matches any submenu item
-    let submenuMatched = false;
-    ["main", "support", "others"].forEach((menuType) => {
-      const items =
-        menuType === "main"
-          ? navItems
-          : menuType === "support"
-          ? supportItems
-          : othersItems;
-      items.forEach((nav, index) => {
-        if (nav.subItems) {
-          nav.subItems.forEach((subItem) => {
-            if (isActive(subItem.path)) {
-              setOpenSubmenu({
-                type: menuType as "main" | "support" | "others",
-                index,
-              });
-              submenuMatched = true;
-            }
-          });
-        }
-      });
-    });
+    if (openSubmenu) return;
+    const sections: Array<
+      ["main" | "finance" | "reports" | "support", NavItem[]]
+    > = [
+      ["main", mainNav],
+      ["finance", financeNav],
+      ["reports", reportsAndAdminNav],
+      ["support", supportNav],
+    ];
 
-    // If no submenu item matches, close the open submenu
-    if (!submenuMatched) {
-      setOpenSubmenu(null);
+    // let matched: {
+    //   type: "main" | "finance" | "reports" | "support";
+    //   index: number;
+    // } | null = null;
+
+    // sections.forEach(([type, items]) => {
+    //   items.forEach((nav, index) => {
+    //     if (nav.subItems?.some((si) => isActive(si.path!))) {
+    //       matched = { type, index };
+    //     }
+    //   });
+    // });
+
+    // setOpenSubmenu(matched);
+
+    for (const [type, items] of sections) {
+      const idx = items.findIndex((nav) =>
+        nav.subItems?.some((si) => isInTree(pathname, si.path!))
+      );
+      if (idx >= 0) {
+        setOpenSubmenu({ type, index: idx });
+        break;
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, isActive]);
 
   useEffect(() => {
-    // Set the height of the submenu items when the submenu is opened
     if (openSubmenu !== null) {
       const key = `${openSubmenu.type}-${openSubmenu.index}`;
       if (subMenuRefs.current[key]) {
-        setSubMenuHeight((prevHeights) => ({
-          ...prevHeights,
+        setSubMenuHeight((prev) => ({
+          ...prev,
           [key]: subMenuRefs.current[key]?.scrollHeight || 0,
         }));
       }
@@ -367,19 +240,194 @@ const AppSidebar: React.FC = () => {
 
   const handleSubmenuToggle = (
     index: number,
-    menuType: "main" | "support" | "others"
+    menuType: "main" | "finance" | "reports" | "support"
   ) => {
-    setOpenSubmenu((prevOpenSubmenu) => {
-      if (
-        prevOpenSubmenu &&
-        prevOpenSubmenu.type === menuType &&
-        prevOpenSubmenu.index === index
-      ) {
-        return null;
-      }
-      return { type: menuType, index };
-    });
+    setOpenSubmenu((prev) =>
+      prev && prev.type === menuType && prev.index === index
+        ? null
+        : { type: menuType, index }
+    );
   };
+
+  const renderMenuItems = (
+    navItems: NavItem[],
+    menuType: "main" | "finance" | "reports" | "support"
+  ) => (
+    <ul className="flex flex-col gap-4">
+      {navItems.map((nav, index) => {
+        const sectionCurrent =
+          !!nav.subItems?.some(
+            (si) => si.path && isInTree(pathname, si.path)
+          ) ||
+          (!!nav.path && isInTree(pathname, nav.path));
+
+        return (
+          <li key={nav.name}>
+            {nav.subItems ? (
+              <button
+                onClick={() => handleSubmenuToggle(index, menuType)}
+                // className={`menu-item group  ${
+                //   openSubmenu?.type === menuType && openSubmenu?.index === index
+                //     ? "menu-item-active"
+                //     : "menu-item-inactive"
+                // } cursor-pointer ${
+                //   !isExpanded && !isHovered
+                //     ? "lg:justify-center"
+                //     : "lg:justify-start"
+                // }`}
+                className={`menu-item group cursor-pointer ${
+                  sectionCurrent
+                    ? "menu-item-parent-active"
+                    : "menu-item-inactive"
+                } ${
+                  !isExpanded && !isHovered
+                    ? "lg:justify-center"
+                    : "lg:justify-start"
+                }`}
+              >
+                {/* <span
+                  className={` ${
+                    openSubmenu?.type === menuType &&
+                    openSubmenu?.index === index
+                      ? "menu-item-icon-active"
+                      : "menu-item-icon-inactive"
+                  }`}
+                > */}
+                <span
+                  className={`${
+                    sectionCurrent
+                      ? "menu-item-icon-active"
+                      : "menu-item-icon-inactive"
+                  }`}
+                >
+                  {nav.icon}
+                </span>
+                {(isExpanded || isHovered || isMobileOpen) && (
+                  // <span className={`menu-item-text`}>{nav.name}</span>
+                  <span
+                    className={`menu-item-text ${
+                      sectionCurrent
+                        ? "text-brand-600 dark:text-brand-400 font-medium"
+                        : "text-inherit"
+                    }`}
+                  >
+                    {nav.name}
+                  </span>
+                )}
+                {(isExpanded || isHovered || isMobileOpen) && (
+                  <ChevronDownIcon
+                    className={`ml-auto w-5 h-5 transition-transform duration-200  ${
+                      openSubmenu?.type === menuType &&
+                      openSubmenu?.index === index
+                        ? "rotate-180 text-brand-500"
+                        : ""
+                    }`}
+                  />
+                )}
+              </button>
+            ) : (
+              nav.path && (
+                <Link
+                  href={nav.path}
+                  // className={`menu-item group ${
+                  //   isActive(nav.path)
+                  //     ? "menu-item-active"
+                  //     : "menu-item-inactive"
+                  // }`}
+                  className={`menu-item group ${
+                    isExactActive(pathname, nav.path)
+                      ? "menu-item-active"
+                      : "menu-item-inactive"
+                  }`}
+                >
+                  {/* <span
+                    className={`${
+                      isActive(nav.path)
+                        ? "menu-item-icon-active"
+                        : "menu-item-icon-inactive"
+                    }`}
+                  > */}
+                  <span
+                    className={`${
+                      isExactActive(pathname, nav.path)
+                        ? "menu-item-icon-active"
+                        : "menu-item-icon-inactive"
+                    }`}
+                  >
+                    {nav.icon}
+                  </span>
+                  {(isExpanded || isHovered || isMobileOpen) && (
+                    <span className={`menu-item-text`}>{nav.name}</span>
+                  )}
+                </Link>
+              )
+            )}
+            {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
+              <div
+                ref={(el) => {
+                  subMenuRefs.current[`${menuType}-${index}`] = el;
+                }}
+                className="overflow-hidden transition-all duration-300"
+                style={{
+                  height:
+                    openSubmenu?.type === menuType &&
+                    openSubmenu?.index === index
+                      ? `${subMenuHeight[`${menuType}-${index}`]}px`
+                      : "0px",
+                }}
+              >
+                <ul className="mt-2 space-y-1 ml-9">
+                  {nav.subItems.map((subItem) => (
+                    <li key={subItem.name}>
+                      <Link
+                        href={subItem.path}
+                        // className={`menu-dropdown-item ${
+                        //   isActive(subItem.path)
+                        //     ? "menu-dropdown-item-active"
+                        //     : "menu-dropdown-item-inactive"
+                        // }`}
+                        className={`menu-dropdown-item ${
+                          isExactActive(pathname, subItem.path)
+                            ? "menu-dropdown-item-active"
+                            : "menu-dropdown-item-inactive"
+                        }`}
+                      >
+                        {subItem.name}
+                        {/* <span className="flex items-center gap-1 ml-auto">
+                          {subItem.new && (
+                            <span
+                              className={`ml-auto ${
+                                isActive(subItem.path)
+                                  ? "menu-dropdown-badge-active"
+                                  : "menu-dropdown-badge-inactive"
+                              } menu-dropdown-badge `}
+                            >
+                              new
+                            </span>
+                          )}
+                          {subItem.pro && (
+                            <span
+                              className={`ml-auto ${
+                                isActive(subItem.path)
+                                  ? "menu-dropdown-badge-active"
+                                  : "menu-dropdown-badge-inactive"
+                              } menu-dropdown-badge `}
+                            >
+                              pro
+                            </span>
+                          )}
+                        </span> */}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
 
   return (
     <aside
@@ -435,12 +483,44 @@ const AppSidebar: React.FC = () => {
                 }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Menu"
+                  "Main Menu"
                 ) : (
                   <HorizontaLDots />
                 )}
               </h2>
-              {renderMenuItems(navItems, "main")}
+              {renderMenuItems(mainNav, "main")}
+            </div>
+            <div>
+              <h2
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                  !isExpanded && !isHovered
+                    ? "lg:justify-center"
+                    : "justify-start"
+                }`}
+              >
+                {isExpanded || isHovered || isMobileOpen ? (
+                  "Finance"
+                ) : (
+                  <HorizontaLDots />
+                )}
+              </h2>
+              {renderMenuItems(financeNav, "finance")}
+            </div>
+            <div>
+              <h2
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                  !isExpanded && !isHovered
+                    ? "lg:justify-center"
+                    : "justify-start"
+                }`}
+              >
+                {isExpanded || isHovered || isMobileOpen ? (
+                  "Reports & Admin"
+                ) : (
+                  <HorizontaLDots />
+                )}
+              </h2>
+              {renderMenuItems(reportsAndAdminNav, "reports")}
             </div>
             <div>
               <h2
@@ -456,23 +536,7 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              {renderMenuItems(supportItems, "support")}
-            </div>
-            <div>
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Others"
-                ) : (
-                  <HorizontaLDots />
-                )}
-              </h2>
-              {renderMenuItems(othersItems, "others")}
+              {renderMenuItems(supportNav, "support")}
             </div>
           </div>
         </nav>
